@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Page Title</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
+  <!-- <script src="main.js"></script> -->
+</head>
+
+<body>
+  <div id="d1" style='width:200px;height: 200px;'></div>
+
+</body>
+<!-- <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script> -->
+<script src="./utils.js"></script>
+<!-- <script type="text/babel"> -->
+<script>
+
+// import Utils from 'utils.js'
+// let obj={a:{b:1,c:2,d:{e:3}},f:3}
+// let newObj=Utils.deepClone(obj)
+// newObj.a.b=11
+// console.log(newObj)
+// console.log(obj)
+
+// let arr=[1,2,[3,4,5]]
+// let newArr=Utils.deepClone(arr)
+// newArr[2][0]=333
+// console.log(arr)
+// console.log(newArr)
+
+// let obj2={a:{b:1,c:2,d:{e:3}},f:3}
+// let newObj2=JSON.parse(JSON.stringify(obj2)) 
+// newObj2.a.c=222
+// console.log(obj2)
+// console.log(newObj2)
+let newObj = Utils.formatTime({dateSeparator:'-',timeSeparator:':',hour:'3.5'})
+console.log(newObj)
+let hanzi = Utils.getCharacter('cn')
+console.log(hanzi)
+let time = Utils.timeStamp()
+console.log(time)
+let color = Utils.getColor({randomOpa: true})
+console.log(color)
+d1.style.background=color
+
+
+
+
+</script>
+
+</html>
