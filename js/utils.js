@@ -19,7 +19,7 @@ class Utils {
    * 
    * @static
    * @param {Function} fn - 回调函数
-   * @param {Number} ms - 防抖时间
+   * @param {Number} ms - 防抖时间：非DOM操作 > 4ms，DOM操作 > 16.7ms
    * @returns {Function}
    * @memberof Utils
    */
@@ -35,7 +35,7 @@ class Utils {
    * 时间戳：可添加自定义头部
    *
    * @static
-   * @param {Date} date - Date对象
+   * @param {String} [prefix=''] - Date对象
    * @returns {String}
    * @memberof Utils
    */
@@ -119,7 +119,6 @@ class Utils {
   }
   /**
    * 随机生成汉字、大小写字母、1~10的数字
-   * 
    * @static
    * @param {String} type - 字符的类型
    * @returns {String}
@@ -138,14 +137,14 @@ class Utils {
     }
   }
   /**
-  * 随机色
-  * 
-  * @param {Number} opacity - 透明度
-  * @param {String} opacityType - 透明度是否随机
-  * @static
-  * @returns {String}
-  * @memberof Utils
-  */
+   * 随机色
+   * 
+   * @param {Number} opacity - 透明度
+   * @param {String} opacityType - 透明度是否随机
+   * @static
+   * @returns {String}
+   * @memberof Utils
+   */
   static getColor({ opacity = 1, randomOpa = false } = {}) {
     let randomColor = []
     for (let i = 0; i < 3; i++) {
@@ -153,6 +152,35 @@ class Utils {
     }
     opacity = randomOpa ? Math.random() : 1
     return `rgba(${randomColor[0]},${randomColor[1]},${randomColor[2]},${opacity})`
+  }
+
+  /**
+   * url添加参数
+   * @static
+   * @param {string} url - 需要添加参数的url
+   * @param {object} params - 添加的参数，参数是'key:value'形式
+   * @param {boolean} [isEncode=false] - 传入的url是否被编码过
+   * @param {boolean} [needEncode=false] - 返回的url是否需要编码
+   * @returns {string}
+   * @memberof Utils
+   */
+  static addParams({ url = '', params = {}, isEncode = false, needEncode = false } = {}) {
+    url = isEncode ? decodeURIComponent(url) : url;
+    if (url.indexOf('?') > -1) {
+      let oldParams = {};
+      url.split('?')[1].split('&').forEach(val => {
+        let newVal = val.split('=');
+        oldParams[newVal[0]] = newVal[1];
+      });
+      // 合并、去重参数
+      params = { ...oldParams, ...params };
+    }
+    let [paramsStr, i] = ['', 1];
+    for (let [key, val] of Object.entries(params)) {
+      paramsStr += i > 1 ? `&${key}=${val}` : `${key}=${val}`;
+      i++;
+    }
+    return needEncode ? encodeURIComponent(`${url.split('?')[0]}?${paramsStr}`) : `${url.split('?')[0]}?${paramsStr}`;
   }
 
 }
