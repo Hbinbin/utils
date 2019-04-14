@@ -1,7 +1,26 @@
 class Utils {
   /**
+   * 数组去重
+   * @static
+   * @param {Array} array - 数组
+   * @returns {Array}
+   * @memberof Utils
+   */
+  static unique(array = []) {
+    return [...new Set(array)];
+  }
+  /**
+   * 数组降维
+   * @static
+   * @param {Array} array - 多维数组
+   * @returns {Array}
+   * @memberof Utils
+   */
+  static dimReduction = (arr = []) => {
+    return Array.of(String(arr))
+  }
+  /**
    * 深克隆
-   * 
    * @static
    * @param {Object|Array} obj - 引用类型Object、Array
    * @returns {Object|Array}
@@ -16,7 +35,6 @@ class Utils {
   }
   /**
    * 防抖
-   * 
    * @static
    * @param {Function} fn - 回调函数
    * @param {Number} ms - 防抖时间：非DOM操作 > 4ms，DOM操作 > 16.7ms
@@ -30,6 +48,35 @@ class Utils {
       timer = setTimeout(() => fn.apply(this, args), ms)
     }
   }
+
+  /**
+   * 节流
+   * @static
+   * @param {Function} fn - 回调函数
+   * @param {Number} wait - 节流时间：非DOM操作 > 4ms，DOM操作 > 16.7ms
+   * @returns {Function}
+   * @memberof Utils
+   */
+  static throttle (fn, wait) {
+    let inThrottle, lastFn, lastTime;
+    return function () {
+      const context = this,
+        args = arguments;
+      if (!inThrottle) {
+        fn.apply(context, args);
+        lastTime = Date.now();
+        inThrottle = true;
+      } else {
+        clearTimeout(lastFn);
+        lastFn = setTimeout(function () {
+          if (Date.now() - lastTime >= wait) {
+            fn.apply(context, args);
+            lastTime = Date.now();
+          }
+        }, Math.max(wait - (Date.now() - lastTime), 0));
+      }
+    };
+  };
 
   /**
    * 时间戳：可添加自定义头部
@@ -82,39 +129,33 @@ class Utils {
    * @memberof Utils
    */
   static browserType() {
-    let userAgent = navigator.userAgent
-    let isOpera = userAgent.indexOf('Opera') > -1 // 判断是否Opera浏览器
-    let isIE = userAgent.indexOf('compatible') > -1 && userAgent.indexOf('MSIE') > -1 && !isOpera // 判断是否IE浏览器
-    let isEdge = userAgent.indexOf('Edge') > -1 && !isIE // 判断是否IE的Edge浏览器
-    let isFF = userAgent.indexOf('Firefox') > -1 // 判断是否Firefox浏览器
-    let isSafari = userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') === -1 // 判断是否Safari浏览器
-    let isChrome = userAgent.indexOf('Chrome') > -1 && userAgent.indexOf('Safari') > -1 // 判断Chrome浏览器
+    let userAgent = navigator.userAgent,
+        isOpera = userAgent.indexOf('Opera') > -1, // 判断是否Opera浏览器
+        isIE = userAgent.indexOf('compatible') > -1 && userAgent.indexOf('MSIE') > -1 && !isOpera, // 判断是否IE浏览器
+        isEdge = userAgent.indexOf('Edge') > -1 && !isIE, // 判断是否IE的Edge浏览器
+        isFF = userAgent.indexOf('Firefox') > -1, // 判断是否Firefox浏览器
+        isSafari = userAgent.indexOf('Safari') > -1 && userAgent.indexOf('Chrome') === -1, // 判断是否Safari浏览器
+        isChrome = userAgent.indexOf('Chrome') > -1 && userAgent.indexOf('Safari') > -1 // 判断Chrome浏览器
     if (isIE || isEdge) {
-      window.vue.$alarm.showError('您当前是IE浏览器，请使用Chrome浏览器，打开标记工具！')
-      return false
+      console.log('您当前是IE浏览器，请使用Chrome浏览器，打开标记工具！')
     } else if (isOpera) {
-      window.vue.$alarm.showError('您当前是Opera浏览器，请使用Chrome浏览器，打开标记工具！')
-      return false
+      console.log('您当前是Opera浏览器，请使用Chrome浏览器，打开标记工具！')
     } else if (isFF) {
-      window.vue.$alarm.showError('您当前是FireFox浏览器，请使用Chrome浏览器，打开标记工具！')
-      return false
+      console.log('您当前是FireFox浏览器，请使用Chrome浏览器，打开标记工具！')
     } else if (isSafari) {
-      window.vue.$alarm.showError('您当前是Safari浏览器，请使用Chrome浏览器，打开标记工具！')
-      return false
+      console.log('您当前是Safari浏览器，请使用Chrome浏览器，打开标记工具！')
     } else if (isChrome) {
       let regChrome = /chrome\/[\d.]+/gi
       let version = String(userAgent.match(regChrome)).split('/')[1]
       let firstVersionNum = version.split('.')[0]
       if (firstVersionNum < 50) { // 版本小于50，提示升级
-        window.vue.$alarm.showWarning(`您当前Chrome版本是：${version},请升级到最新版本`)
+        console.log(`您当前Chrome版本是：${version},请升级到最新版本`)
         return false
       } else {
-        // window.vue.$alarm.showSuccess(`欢迎使用标记工具！`)
         return true
       }
     } else {
-      window.vue.$alarm.showError('请使用Chrome浏览器，打开标记工具！')
-      return false
+      console.log('请使用Chrome浏览器，打开标记工具！')
     }
   }
   /**
@@ -181,6 +222,42 @@ class Utils {
       i++;
     }
     return needEncode ? encodeURIComponent(`${url.split('?')[0]}?${paramsStr}`) : `${url.split('?')[0]}?${paramsStr}`;
+  }
+  /**
+     * url参数查询
+     * @static
+     * @param {String} url - url地址
+     * @param {String} query - 查询参数
+     * @returns {Object|String}
+     * @memberof Utils
+     */
+  static getParams({ url = '', query } = {}) {
+    let paramStr = url.split('?')[1];
+    let [paramArr, params] = [paramStr && paramStr.split('&') || [], {}];
+    paramArr.forEach((param, i) => {
+      param = param.split('=');
+      params[param[0]] = param[1];
+    });
+    return query ? params[query] : params;
+  }
+  /**
+     * 小程序路径层级
+     * @static
+     * @param {Array} array - 数组
+     * @returns {Array}
+     * @memberof Utils
+     */
+  static pagePath({ path = '', moduleName = 'pages', data = {} } = {}) {
+    let currentPages = getCurrentPages();
+    let currentRoute = currentPages[currentPages.length - 1].route;
+    let [routeLevel, backLevel] = [currentRoute.split('/').length, ""];
+    for (let i = 0; i < routeLevel - 1; i++) {
+      backLevel += '../'
+    }
+    return this.addParams({
+      url: backLevel + path,
+      params: data,
+    });
   }
 
 }
