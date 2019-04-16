@@ -12,12 +12,26 @@ class Utils {
   /**
    * 数组降维
    * @static
+   * @desc 数组元素只支持：String、Number、Function
    * @param {Array} array - 多维数组
    * @returns {Array}
    * @memberof Utils
    */
   static dimReduction = (arr = []) => {
     return Array.of(String(arr))
+  }
+  /**
+   * 数组乱序
+   * @static
+   * @desc 数组元素只支持：String、Number
+   * @param {Array} array - 数组
+   * @returns {Array}
+   * @memberof Utils
+   */
+  static randomArray = (array) => {
+    return array.sort(function () {
+      return Math.random() - 0.5
+    })
   }
   /**
    * 深克隆
@@ -176,6 +190,13 @@ class Utils {
       case 'number': // 48~57 0~9
         return String.fromCodePoint(Math.round(Math.random() * (57 - 48 + 1)) + 48)
     }
+  }
+  deepClone = (obj) =>{
+    let clone = [...obj];
+    Object.keys(clone).map((key) => {
+      clone[key] = typeof obj[key] === 'object' ? deepClone(obj[key]) : obj[key];
+    })
+    return Array.isArray(obj) ? (clone.length = obj.length) && Array.from(clone) : clone;
   }
   /**
    * 随机色

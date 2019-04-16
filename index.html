@@ -36,15 +36,29 @@
 // newObj2.a.c=222
 // console.log(obj2)
 // console.log(newObj2)
-let newObj = Utils.formatTime({dateSeparator:'-',timeSeparator:':',hour:'3.5'})
-console.log(newObj)
-let hanzi = Utils.getCharacter('cn')
-console.log(hanzi)
-let time = Utils.timeStamp()
-console.log(time)
-let color = Utils.getColor({randomOpa: true})
-console.log(color)
-d1.style.background=color
+// let newObj = Utils.formatTime({dateSeparator:'-',timeSeparator:':',hour:'3.5'})
+// console.log(newObj)
+// let hanzi = Utils.getCharacter('cn')
+// console.log(hanzi)
+// let time = Utils.timeStamp()
+// console.log(time)
+// let color = Utils.getColor({randomOpa: true})
+// console.log(color)
+// d1.style.background=color
+const curry = (fn, ...arg1) => {
+  let allArg = arg1;
+  return (...arg2) => {
+    allArg.push(...arg2);
+    return fn.apply(null, allArg);
+  }
+}
+const add = curry(function(...arg){
+  return arg.reduce(function(a,b){
+    return a+b
+  })
+},1,2)
+console.log('add(3,4): ', add(3,4));
+
 
 
 
