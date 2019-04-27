@@ -12,13 +12,12 @@ class Utils {
   /**
    * 数组降维
    * @static
-   * @desc 数组元素只支持：String、Number、Function
    * @param {Array} array - 多维数组
    * @returns {Array}
    * @memberof Utils
    */
   static dimReduction = (arr = []) => {
-    return Array.of(String(arr))
+    return arr.flat(Infinity)
   }
   /**
    * 数组乱序
