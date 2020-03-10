@@ -14,9 +14,50 @@
 
 </body>
 <!-- <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script> -->
-<script src="./utils.js"></script>
+<script src="./js/utils.js"></script>
+<!-- <script src="./js/try.js"></script> -->
 <!-- <script type="text/babel"> -->
 <script>
+  const arr = [{a:1},{a:2,b:2},{c:4}]
+  Utils.remove(arr, (item) => item.a === 2)
+  console.log('arr: ', arr);
+  // const arr = [{a:1,b:2},2,{c:3,d:4,e:{f:5}}];
+  // const deepObj = Utils.deepClone(arr);
+  // console.log('deepObj: ', deepObj);
+//  const isString = val => typeof val === 'string'
+//   const get = (obj, keys = [], defaultValue) => {
+//     console.log('keys: ', keys.split('.'));
+//       try {
+//         const keyArr = isString(keys) ? keys.split('.') : keys;
+//         console.log('keyArr: ', keyArr);
+//         const result = keyArr.reduce(
+//           (res, key) => { 
+//             console.log('res[key]: ', res[key]);
+//             return res[key]
+//           },
+//           obj
+//         )
+//         console.log('result: ', result);
+//         return isUndefined(result) ? defaultValue : result
+//       } catch (e) {
+//         console.log(e);
+//         return defaultValue
+//       }
+//     }
+//   const morFlatObj = {
+//     a: {
+//       b: {
+//         c: {
+//           d: 1111
+//         }
+//       }
+//     }
+//   }
+  // 'a.b.c.d'.split('.').reduce(function(res, key) {
+  //   console.log('res[key]: ', res[key]);
+  //   return res[key]
+  // }, morFlatObj)
+  // console.log('get', get(morFlatObj, 'a.b.c.d'));
 
 // import Utils from 'utils.js'
 // let obj={a:{b:1,c:2,d:{e:3}},f:3}

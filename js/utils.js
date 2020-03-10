@@ -16,8 +16,8 @@ class Utils {
    * @returns {Array}
    * @memberof Utils
    */
-  static dimReduction = (arr = []) => {
-    return arr.flat(Infinity)
+  static arrFlat = (arr = [], level = Infinity) => {
+    return arr.flat(level)
   }
   /**
    * 数组乱序
@@ -32,6 +32,27 @@ class Utils {
       return Math.random() - 0.5
     })
   }
+  /**
+   * 
+   * @param {*} obj 
+   */
+  /**
+   * 移除数组元素
+   * @static
+   * @param {Array} arr - 数组
+   * @param {Function} fn - 过滤规则
+   * @returns {Array}
+   * @memberof Utils
+   */
+  static remove(arr, fn){
+    return Array.isArray(arr)
+      ? arr.filter(fn).reduce((acc, val) => {
+          arr.splice(arr.indexOf(val), 1);
+          return acc.concat(val);
+        }, [])
+      : [];
+  }
+    
   /**
    * 深克隆
    * @static
