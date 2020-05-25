@@ -7,6 +7,24 @@ export const unique = (array = []) => {
   return [...new Set(array)];
 }
 /**
+ * 俩数组交集
+ * @param {Array} array1 - 数组1
+ * @param {Array} array2 - 数组2
+ * @returns {Array}
+ */
+export const intersect = (arr1 = [], arr2 = []) => {
+  return new Set([...arr1].filter(item => arr2.has(item)));
+}
+/**
+ * 俩数组差集
+ * @param {Array} array1 - 数组1
+ * @param {Array} array2 - 数组2
+ * @returns {Array}
+ */
+export const difference = (arr1 = [], arr2 = []) => {
+  return new Set([...arr1].filter(item => !arr2.has(item)));
+}
+/**
  * 数组降维
  * @param {Array} array - 多维数组
  * @returns {Array}
