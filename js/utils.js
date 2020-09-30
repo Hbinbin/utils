@@ -282,12 +282,12 @@ class Utils {
     return query ? params[query] : params;
   }
   /**
-     * 小程序路径层级
-     * @static
-     * @param {Array} array - 数组
-     * @returns {Array}
-     * @memberof Utils
-     */
+   * 小程序路径层级
+   * @static
+   * @param {Array} array - 数组
+   * @returns {Array}
+   * @memberof Utils
+   */
   static pagePath({ path = '', moduleName = 'pages', data = {} } = {}) {
     let currentPages = getCurrentPages();
     let currentRoute = currentPages[currentPages.length - 1].route;
@@ -302,3 +302,23 @@ class Utils {
   }
 
 }
+
+/**
+ * runAsync
+ * @param {*} fn 
+ */
+const runAsync = fn => {
+  const worker = new Worker(
+    URL.createObjectURL(new Blob([`postMessage((${fn})());`]), {
+      type: 'application/javascript; charset=utf-8'
+    })
+  );
+  return new Promise((res, rej) => {
+    worker.onmessage = ({ data }) => {
+      res(data), worker.terminate();
+    };
+    worker.onerror = err => {
+      rej(err), worker.terminate();
+    };
+  });
+};

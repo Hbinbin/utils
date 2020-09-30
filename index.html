@@ -18,9 +18,35 @@
 <!-- <script src="./js/try.js"></script> -->
 <!-- <script type="text/babel"> -->
 <script>
-  const arr = [{a:1},{a:2,b:2},{c:4}]
-  Utils.remove(arr, (item) => item.a === 2)
-  console.log('arr: ', arr);
+   const isUndefined = val => typeof val === 'undefined'
+   const isNull = val => val === null
+   const isFunction = val => typeof val === 'function'
+   const isString = val => typeof val === 'string'
+   const isExist = val => !(isUndefined(val) || isNull(val))
+
+  /**
+   * get 安全取值
+   * @param {object} obj - 取值的对象
+   * @param {string | array} keys - 取值方式
+   * @param {any} defaultValue - 取不到值时的默认值
+   * @desc 例：get(obj, 'a.b')；get(obj, ['a', 'b'])；get(obj, 'c.b')；带默认值：get(obj, 'c.b', 1)
+   */
+   const get = (obj, keys = [], defaultValue) => {
+    try {
+      const result = (isString(keys) ? keys.split('.') : keys).reduce(
+        (res, key) => res[key],
+        obj
+      )
+      return isUndefined(result) ? defaultValue : result
+    } catch (e) {
+      return defaultValue
+    }
+  }
+  const obj = {a:{b:{c:{ d: { e: 2 }}}}}
+  console.log(get(obj, 'a.b.c.e'));
+  // const arr = [{a:1},{a:2,b:2},{c:4}]
+  // Utils.remove(arr, (item) => item.a === 2)
+  // console.log('arr: ', arr);
   // const arr = [{a:1,b:2},2,{c:3,d:4,e:{f:5}}];
   // const deepObj = Utils.deepClone(arr);
   // console.log('deepObj: ', deepObj);
