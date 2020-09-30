@@ -205,18 +205,24 @@ export const getCharacter = (type) =>  {
   }
 }
 /**
- * 随机色
+ * 随机色-rgba
  * @param {Number} opacity - 透明度
  * @param {String} opacityType - 透明度是否随机
  * @returns {String}
  */
-export const getColor = ({ opacity = 1, randomOpa = false } = {}) => {
+export const getRGBAColor = ({ opacity = 1, randomOpa = false } = {}) => {
   let randomColor = []
   for (let i = 0; i < 3; i++) {
     randomColor[i] = Math.floor(Math.random() * 256)
   }
   opacity = randomOpa ? Math.random() : 1
   return `rgba(${randomColor[0]},${randomColor[1]},${randomColor[2]},${opacity})`
+}
+/**
+ * 随机色-十六进制
+ */
+export const get16Color = () => {
+  return '#' + Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, '0')
 }
 
 /**
@@ -245,13 +251,25 @@ export const addParams = ({ url = '', params = {}, isEncode = false, needEncode 
   }
   return needEncode ? encodeURIComponent(`${url.split('?')[0]}?${paramsStr}`) : `${url.split('?')[0]}?${paramsStr}`;
 }
+
+/**
+ * url参数查询
+ * @param {string} [url=location.search] - url地址
+ * @param {string} [query] - 查询参数
+ * @returns {Object|String}
+ */
+export const getParams = function({ url = location.search, query } = {}) {
+  const params = {}
+  location.search.replace(/([^?&=]+)=([^&]+)/g, (_,k,v) => params[k] = v);
+  return query ? params[query] : params;
+}
 /**
  * url参数查询
  * @param {String} url - url地址
  * @param {String} query - 查询参数
  * @returns {Object|String}
  */
-export const getParams = ({ url = '', query } = {}) => {
+export const getParamsOld = ({ url = '', query } = {}) => {
   let paramStr = url.split('?')[1];
   let [paramArr, params] = [paramStr && paramStr.split('&') || [], {}];
   paramArr.forEach((param, i) => {
@@ -299,3 +317,11 @@ const runAsync = fn => {
     };
   });
 };
+
+/**
+ * 生成长度为11的随机字母数字字符串
+ */
+export const getRandomId = function() {
+  return Math.random().toString(36).substring(2);
+}
+
