@@ -1,126 +1,118 @@
-/**
- * 数组去重
- * @param {Array} array - 数组
- * @returns {Array}
- */
-export const unique = (array = []) => {
-  return [...new Set(array)];
-}
-/**
- * 俩数组交集
- * @param {Array} array1 - 数组1
- * @param {Array} array2 - 数组2
- * @returns {Array}
- */
-export const intersect = (arr1 = [], arr2 = []) => {
-  return new Set([...arr1].filter(item => arr2.has(item)));
-}
-/**
- * 俩数组差集
- * @param {Array} array1 - 数组1
- * @param {Array} array2 - 数组2
- * @returns {Array}
- */
-export const difference = (arr1 = [], arr2 = []) => {
-  return new Set([...arr1].filter(item => !arr2.has(item)));
-}
-/**
- * 数组降维
- * @param {Array} array - 多维数组
- * @returns {Array}
- */
-export const arrFlat = (arr = [], level = Infinity) => {
-  return arr.flat(level)
-}
-/**
- * 数组乱序
- * @desc 数组元素只支持：String、Number
- * @param {Array} array - 数组
- * @returns {Array}
- */
-export const randomArray = (array) => {
-  return array.sort(function () {
-    return Math.random() - 0.5
-  })
-}
-/**
- * 移除数组元素
- * @param {Array} arr - 数组
- * @param {Function} fn - 过滤规则
- * @returns {Array}
- */
-export const remove = (arr, fn) =>{
-  return Array.isArray(arr)
-    ? arr.filter(fn).reduce((acc, val) => {
-        arr.splice(arr.indexOf(val), 1);
-        return acc.concat(val);
-      }, [])
-    : [];
-}
+
+
 /**
  * 深克隆
+ * * 解决循环引用问题
  * @param {Object|Array} obj - 引用类型Object、Array
  * @returns {Object|Array}
  */
-export const deepClone = obj => {
-  if (obj === null) return null
-  let clone = Object.assign({}, obj)
-  Object.keys(clone).forEach(
-    key => (clone[key] = typeof obj[key] === 'object' ? deepClone(obj[key]) : obj[key])
-  )
-  return Array.isArray(obj)
-    ? (clone.length = obj.length) && Array.from(clone)
-    : clone
+export const cloneDeep = function (obj) {
+  if (typeof obj !== 'object' || obj === null) return obj
+
+  // 用来记录已克隆的对象
+  const weekMap = new WeakMap()
+
+  const recClone = obj => {
+    // 解决对象循环引用的问题
+    if (weekMap.has(obj)) return weekMap.get(obj)
+    const cloneObj = Object.assign({}, obj)
+    weekMap.set(obj, cloneObj)
+
+    // 如果属性值是引用类型，递归
+    Object.keys(obj).forEach(key => {
+      cloneObj[key] =
+        typeof obj[key] === 'object' && obj !== null
+          ? recClone(obj[key])
+          : obj[key]
+    })
+
+    // 如果obj是数组，Object.assign会将数据转换为对象，此处用Array.from转回数组
+    return Array.isArray(obj)
+      ? (cloneObj.length = obj.length) && Array.from(cloneObj)
+      : cloneObj
+  }
+  return recClone(obj)
 }
+
 /**
  * 防抖
+ * @desc wait时间内只触发一次，如果wait时间内再次触发，则重新计算时间
  * @param {Function} fn - 回调函数
- * @param {Number} ms - 防抖时间：非DOM操作 > 4ms，DOM操作 > 16.7ms
+ * @param {Number} wait - 防抖时间：非DOM操作 > 4ms，DOM操作 > 16.7ms
  * @returns {Function}
  */
-export const debounce = (fn, ms = 0) => {
-  let timer
+export const debounce = function (fn, wait) {
+  let timer = null
   return function (...args) {
-    clearTimeout(timer)
-    timer = setTimeout(() => fn.apply(this, args), ms)
+    timer && clearTimeout(timer)
+    timer = setTimeout(() => {
+      fn.apply(this, args)
+    }, wait)
   }
 }
 
 /**
  * 节流
+ * @desc wait时间内只会触发一次
  * @param {Function} fn - 回调函数
  * @param {Number} wait - 节流时间：非DOM操作 > 4ms，DOM操作 > 16.7ms
  * @returns {Function}
  */
-export const throttle = (fn, wait) => {
-  let inThrottle, lastFn, lastTime;
-  return function () {
-    const context = this,
-      args = arguments;
-    if (!inThrottle) {
-      fn.apply(context, args);
-      lastTime = Date.now();
-      inThrottle = true;
-    } else {
-      clearTimeout(lastFn);
-      lastFn = setTimeout(function () {
-        if (Date.now() - lastTime >= wait) {
-          fn.apply(context, args);
-          lastTime = Date.now();
-        }
-      }, Math.max(wait - (Date.now() - lastTime), 0));
-    }
-  };
-};
+export const throttle = function (fn, wait) {
+  let flag = false
+  return function (...args) {
+    if (flag) return
+    flag = true
+    setTimeout(() => {
+      fn.apply(this, args)
+      flag = false
+    }, wait)
+  }
+}
+
+/**
+ * 数字的千分位处理
+ * (?:pattern) 
+  非获取匹配，匹配pattern但不获取匹配结果，不进行存储供以后使用。这在使用或字符“(|)”来组合一个模式的各个部分是很有用。例如“industr(?:y|ies)”就是一个比“industry|industries”更简略的表达式。
+  (?=pattern)
+  非获取匹配，正向肯定预查，在任何匹配pattern的字符串开始处匹配查找字符串，该匹配不需要获取供以后使用。例如，“Windows(?=95|98|NT|2000)”能匹配“Windows2000”中的“Windows”，但不能匹配“Windows3.1”中的“Windows”。预查不消耗字符，也就是说，在一个匹配发生后，在最后一次匹配之后立即开始下一次匹配的搜索，而不是从包含预查的字符之后开始。
+  (?!pattern)
+  非获取匹配，正向否定预查，在任何不匹配pattern的字符串开始处匹配查找字符串，该匹配不需要获取供以后使用。例如“Windows(?!95|98|NT|2000)”能匹配“Windows3.1”中的“Windows”，但不能匹配“Windows2000”中的“Windows”。
+  (?<=pattern)
+  非获取匹配，反向肯定预查，与正向肯定预查类似，只是方向相反。例如，“(?<=95|98|NT|2000)Windows”能匹配“2000Windows”中的“Windows”，但不能匹配“3.1Windows”中的“Windows”。
+  (?<!pattern)
+  非获取匹配，反向否定预查，与正向否定预查类似，只是方向相反。例如“(?<!95|98|NT|2000)Windows”能匹配“3.1Windows”中的“Windows”，但不能匹配“2000Windows”中的“Windows”。这个地方不正确，有问题 
+  分类
+ */
+export const toThousand = function (num) {
+  const reg = /(\d{1,3})(?=(\d{3})+$)/g // ?= 正向肯定预查 + 至少一次多了不限
+  return (num + '').replace(reg, '$1,')
+}
+
+/**
+ * 模糊搜索实现
+ * .* 就是单个字符匹配任意次，即贪婪匹配
+ */
+export function fuzzySearch (query, inputs) {
+  query = query.toLowerCase()
+  const searchRes = []
+  const reg = new RegExp(query.split('').join('.*'))
+  inputs.forEach(item => {
+    const lowerCaseItem = item.toLowerCase()
+    reg.test(lowerCaseItem) && searchRes.push(item)
+  })
+  return searchRes
+}
 
 /**
  * 时间戳：可添加自定义头部
  * @param {String} [prefix=''] - Date对象
  * @returns {String}
  */
-export const  timeStamp = ({ prefix = '' } = {}) => {
+export const timeStamp = ({ prefix = '' } = {}) => {
   return prefix + new Date().getTime()
 }
+
 /**
  * 格式化时间
  * @param {Date} [date = new Date()] - 时间对象
@@ -202,26 +194,6 @@ export const getCharacter = (type) =>  {
       return String.fromCodePoint(Math.round(Math.random() * (57 - 48 + 1)) + 48)
   }
 }
-/**
- * 随机色-rgba
- * @param {Number} opacity - 透明度
- * @param {String} opacityType - 透明度是否随机
- * @returns {String}
- */
-export const getRGBAColor = ({ opacity = 1, randomOpa = false } = {}) => {
-  let randomColor = []
-  for (let i = 0; i < 3; i++) {
-    randomColor[i] = Math.floor(Math.random() * 256)
-  }
-  opacity = randomOpa ? Math.random() : 1
-  return `rgba(${randomColor[0]},${randomColor[1]},${randomColor[2]},${opacity})`
-}
-/**
- * 随机色-十六进制
- */
-export const get16Color = () => {
-  return '#' + Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, '0')
-}
 
 /**
  * url添加参数
@@ -297,10 +269,10 @@ export const pagePath = ({ path = '', moduleName = 'pages', data = {} } = {}) =>
 }
 
 /**
- * runAsync
+ * 启动单独的线程去执行耗时的计算
  * @param {*} fn 
  */
-const runAsync = fn => {
+export const runAsync = fn => {
   const worker = new Worker(
     URL.createObjectURL(new Blob([`postMessage((${fn})());`]), {
       type: 'application/javascript; charset=utf-8'
@@ -322,4 +294,102 @@ const runAsync = fn => {
 export const getRandomId = function() {
   return Math.random().toString(36).substring(2);
 }
+
+/**
+ * 检查对象或集合是否为空
+ */
+ export const isEmpty = val => val === null || !(Object.keys(val) || val).length
+ /**
+  * 检查对象是否为某个类型
+  * * is(Array, [1]); // true
+  * * is(ArrayBuffer, new ArrayBuffer()); // true
+  * * is(Map, new Map()); // true
+  * * is(RegExp, /./g); // true
+  * * is(Set, new Set()); // true
+  * * is(WeakMap, new WeakMap()); // true
+  * * is(WeakSet, new WeakSet()); // true
+  * * is(String, ''); // true
+  * * is(String, new String('')); // true
+  * * is(Number, 1); // true
+  * * is(Number, new Number(1)); // true
+  * * is(Boolean, true); // true
+  * * is(Boolean, new Boolean(true)); // true
+  */
+  export const isType = (type, val) => ![, null].includes(val) && val.constructor === type
+/**
+ * 获取对象类型
+ */
+ export const getType = v =>
+  (v === undefined ? 'undefined' : v === null ? 'null' : v.constructor.name.toLowerCase());
+
+
+ /**
+ * 十六进制转rgb
+ */
+export const hexToRgb = function (color) {
+  const hexReg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
+
+  const hwxReg = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/
+  color = color.toLowerCase()
+  if (hexReg.test(color)) {
+    color = color.slice(1) // 去除 '#'
+    if (color.length === 3) {
+      // 三位转六位
+      let newColor = ''
+      for (let i = 0; i < color.length; i++) {
+        newColor += color[i].repeat(2)
+      }
+      color = newColor
+    }
+    if (color.length === 6) {
+      let changeColor = []
+      for (let i = 0; i < 6; i += 2) {
+        // parseInt的第一个参数如果是以0x开头的字符串，会把其余部分转换为十六进制整数
+        changeColor.push(parseInt('0x' + color.slice(i, i + 2)))
+      }
+      return `rgb(${changeColor.join()})`
+    }
+  }
+  return color
+}
+
+/**
+ * rgb转十六进制
+ */
+const rgbToHex = function (color) {
+  const rgbReg = /^(rgb|RGB)/
+  if (rgbReg.test(color)) {
+    // ?:pattern表示非获取匹配，匹配pattern但不获取匹配结果
+    const rgbArr = color.replace(/(?:\(|\)|rgb|RGB)*/g, '').split(',')
+    const color16 = rgbArr.reduce((sum, cur) => {
+      let str16 = Number(cur).toString(16)
+      if (str16 === '0') str16 = str16.repeat(2)
+      return sum + str16
+    }, '#')
+    return color16
+  }
+  return color
+}
+
+/**
+ * 随机色-rgba
+ * @param {Number} opacity - 透明度
+ * @param {String} opacityType - 透明度是否随机
+ * @returns {String}
+ */
+ export const getRGBAColor = ({ opacity = 1, randomOpa = false } = {}) => {
+  let randomColor = []
+  for (let i = 0; i < 3; i++) {
+    randomColor[i] = Math.floor(Math.random() * 256)
+  }
+  opacity = randomOpa ? Math.random() : 1
+  return `rgba(${randomColor[0]},${randomColor[1]},${randomColor[2]},${opacity})`
+}
+/**
+ * 随机色-十六进制
+ */
+export const get16Color = () => {
+  return '#' + Math.floor(Math.random() * 0xffffff).toString(16).padEnd(6, '0')
+}
+
 
